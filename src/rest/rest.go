@@ -4,9 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RunAPI(address string) error {
+func RunAPI() *gin.Engine {
 
 	r := gin.Default()
+
+	h, _ := NewHandler()
 
 	r.GET("/mweets", getAllMweeter)
 	r.POST("/mweets", createMweet)
@@ -14,12 +16,12 @@ func RunAPI(address string) error {
 	r.DELETE("/mweets/:id", deleteMweet)
 	r.GET("/mweets/:id", getMweeterById)
 
-	r.POST("/users/signin", signInUser)
-	r.POST("/users", createUser)
-	r.POST("/users/:id/signout", signOutUser)
-	r.PUT("/mweets/:id", updateProfile)
+	r.POST("/users", h.CreateUser)
+	r.POST("/users/signin", h.SignInUser)
+	// r.POST("/users/:id/signout", signOutUser)
+	r.PUT("/users/:id", h.UpdateProfile)
 
-	return nil
+	return r
 }
 
 func getAllMweeter(ctx *gin.Context) {
@@ -39,21 +41,5 @@ func deleteMweet(ctx *gin.Context) {
 }
 
 func getMweeterById(ctx *gin.Context) {
-	// ...
-}
-
-func createUser(ctx *gin.Context) {
-	// ...
-}
-
-func signInUser(ctx *gin.Context) {
-	// ...
-}
-
-func signOutUser(ctx *gin.Context) {
-	// ...
-}
-
-func updateProfile(ctx *gin.Context) {
 	// ...
 }

@@ -1,7 +1,87 @@
 package rest
 
-import "testing"
+import (
+	"encoding/json"
+	"fmt"
+	"mwitter-backend/src/models"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
 
-func TestXxx(t *testing.T) {
+	"github.com/stretchr/testify/assert"
+)
 
+func TestCreateUser(t *testing.T) {
+	assert := assert.New(t)
+
+	router := RunAPI()
+
+	w := httptest.NewRecorder()
+
+	createData := models.User{OAuth_Type: "Google", Password: "1234", Email: "example@email.com", Nickname: "mamem"}
+
+	data, _ := json.Marshal(createData)
+
+	reader := strings.NewReader(string(data))
+
+	req, err := http.NewRequest("POST", "/users", reader)
+
+	assert.NoError(err)
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(201, w.Code)
+}
+
+func TestSignInUser(t *testing.T) {
+	assert := assert.New(t)
+
+	router := RunAPI()
+
+	w := httptest.NewRecorder()
+
+	getUser := models.User{Password: "1234", Email: "example@email.com"}
+
+	data, _ := json.Marshal(getUser)
+
+	reader := strings.NewReader(string(data))
+
+	req, err := http.NewRequest("POST", "/users/signin", reader)
+
+	assert.NoError(err)
+
+	router.ServeHTTP(w, req)
+
+	resultUser := &models.User{}
+
+	err = json.NewDecoder(w.Body).Decode(resultUser)
+
+	assert.NoError(err)
+
+	assert.Equal(200, w.Code)
+	assert.Equal("example@email.com", resultUser.Email)
+	assert.Equal("", resultUser.Password)
+}
+
+func TestUpdateProfile(t *testing.T) {
+	assert := assert.New(t)
+
+	router := RunAPI()
+
+	w := httptest.NewRecorder()
+
+	updateDate := models.User{Nickname: "mamem"}
+
+	data, _ := json.Marshal(updateDate)
+
+	reader := strings.NewReader(string(data))
+
+	req, err := http.NewRequest("PUT", "/users/1", reader)
+
+	assert.NoError(err)
+
+	fmt.Println()
+
+	router.ServeHTTP(w, req)
 }

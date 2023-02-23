@@ -8,8 +8,8 @@ type DBLayer interface {
 	UpdateMweet()
 	DeleteMweet()
 	GetMweeterById()
-	CreateUser()
-	SignInUser()
+	CreateUser(user *models.User) error
+	SignInUser(email, password string) (*models.User, error)
 	SignOutUser()
-	UpdateProfile()
+	UpdateProfile(id string, UpdateInfo *models.User) error
 }

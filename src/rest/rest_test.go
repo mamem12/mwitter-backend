@@ -71,7 +71,7 @@ func TestUpdateProfile(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	updateDate := models.User{Nickname: "mamem"}
+	updateDate := models.User{Nickname: "mamem2"}
 
 	data, _ := json.Marshal(updateDate)
 

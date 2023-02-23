@@ -120,11 +120,22 @@ func (h *Handler) SignInUser(ctx *gin.Context) {
 		return
 	}
 
+	if user.Email == "" || user.Password == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	userInfo, err := h.db.SignInUser(user.Email, user.Password)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+
+	// fmt.Println(userInfo)
+
+	if userInfo.ID == 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "not found"})
 	}
 
 	ctx.JSON(http.StatusOK, userInfo)

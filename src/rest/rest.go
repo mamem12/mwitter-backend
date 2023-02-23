@@ -10,11 +10,11 @@ func RunAPI() *gin.Engine {
 
 	h, _ := NewHandler()
 
-	r.GET("/mweets", getAllMweeter)
-	r.POST("/mweets", createMweet)
-	r.PUT("/mweets", updateMweet)
-	r.DELETE("/mweets/:id", deleteMweet)
-	r.GET("/mweets/:id", getMweeterById)
+	// r.GET("/mweets", getAllMweeter)
+	// r.POST("/mweets", createMweet)
+	// r.PUT("/mweets", updateMweet)
+	// r.DELETE("/mweets/:id", deleteMweet)
+	// r.GET("/mweets/:id", getMweeterById)
 
 	r.POST("/users", h.CreateUser)
 	r.POST("/users/signin", h.SignInUser)

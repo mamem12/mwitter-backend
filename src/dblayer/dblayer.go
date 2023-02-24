@@ -10,6 +10,7 @@ type DBLayer interface {
 	GetMweeterById()
 	CreateUser(user *models.User) error
 	SignInUser(email, password string) (*models.User, error)
+	SelectUserByEmail(email string) (*models.User, error)
 	SignOutUser()
 	UpdateProfile(id string, UpdateInfo *models.User) error
 }

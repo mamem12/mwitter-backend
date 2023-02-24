@@ -62,8 +62,13 @@ func (d *DBORM) SignOutUser() {
 }
 
 func (db *DBORM) UpdateProfile(id string, updateInfo *models.User) error {
-	fmt.Println(id)
-	fmt.Println(updateInfo)
 
 	return db.Table("users").Where("id = ?", id).Update("nickname", updateInfo.Nickname).Error
+}
+
+func (db *DBORM) SelectUserByEmail(email string) (existUser *models.User, err error) {
+
+	result := db.Table("users").Select("email").Where(&models.User{Email: email})
+
+	return existUser, result.Find(&existUser).Error
 }

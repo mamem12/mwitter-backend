@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"mwitter-backend/src/dblayer"
 	"mwitter-backend/src/models"
 	"net/http"
@@ -97,6 +98,21 @@ func (h *Handler) CreateUser(ctx *gin.Context) {
 		return
 	}
 
+	if user.Email == "" || user.Password == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	existUser, err := h.db.SelectUserByEmail(user.Email)
+
+	fmt.Printf("%+v\n", existUser)
+	fmt.Printf("%s\n", existUser.Email)
+
+	if existUser.Email != "" {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "가입이 중복되었습니다."})
+		return
+	}
+
 	err = h.db.CreateUser(user)
 
 	if err != nil {
@@ -139,7 +155,6 @@ func (h *Handler) SignInUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, userInfo)
-
 }
 
 func (h *Handler) SignOutUser(ctx *gin.Context) {

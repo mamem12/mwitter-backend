@@ -15,6 +15,7 @@ type User struct {
 type Mweet struct {
 	Image   string `json:"img"`
 	Content string `json:"content"`
+	UserId  string `json:"userId"`
 	gorm.Model
 }
 

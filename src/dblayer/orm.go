@@ -15,7 +15,7 @@ type DBORM struct {
 func NewORM(dbname string, con gorm.Config) (*DBORM, error) {
 
 	dsn := fmt.Sprintf("root@tcp(127.0.0.1:3306)/%s?charset=utf8mb4&parseTime=true", dbname)
-
+	dsn = dsn + "&loc=Asia%2FSeoul"
 	db, err := gorm.Open(mysql.Open(dsn), &con)
 
 	db.AutoMigrate(&models.User{}, &models.Mweet{})
@@ -29,7 +29,7 @@ func (d *DBORM) GetAllMweeter() ([]models.Mweet, error) {
 	return nil, nil
 }
 
-func (d *DBORM) CreateMweet(*models.User) error {
+func (d *DBORM) CreateMweet(*models.Mweet) error {
 	return nil
 }
 

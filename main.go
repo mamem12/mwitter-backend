@@ -1,8 +1,6 @@
 package main
 
-import (
-	"mwitter-backend/src/rest"
-)
+import "mwitter-backend/src/rest"
 
 func main() {
 	// fmt.Println("Hello World")

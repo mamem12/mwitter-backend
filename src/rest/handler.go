@@ -59,21 +59,21 @@ func (h *Handler) CreateMweet(ctx *gin.Context) {
 		return
 	}
 
-	user := &models.User{}
-	err := ctx.ShouldBindJSON(user)
+	mweet := &models.Mweet{}
+	err := ctx.ShouldBindJSON(mweet)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err = h.db.CreateMweet(user)
+	err = h.db.CreateMweet(mweet)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, user)
+	ctx.JSON(http.StatusCreated, mweet)
 }
 
 func (h *Handler) UpdateMweet(ctx *gin.Context) {

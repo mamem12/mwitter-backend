@@ -4,7 +4,7 @@ import "mwitter-backend/src/models"
 
 type DBLayer interface {
 	GetAllMweeter() ([]models.Mweet, error)
-	CreateMweet(*models.User) error
+	CreateMweet(*models.Mweet) error
 	UpdateMweet()
 	DeleteMweet()
 	GetMweeterById()

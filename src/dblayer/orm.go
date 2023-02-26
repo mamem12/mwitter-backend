@@ -25,26 +25,6 @@ func NewORM(dbname string, con gorm.Config) (*DBORM, error) {
 	}, err
 }
 
-func (d *DBORM) GetAllMweeter() ([]models.Mweet, error) {
-	return nil, nil
-}
-
-func (d *DBORM) CreateMweet(*models.Mweet) error {
-	return nil
-}
-
-func (d *DBORM) UpdateMweet() {
-
-}
-
-func (d *DBORM) DeleteMweet() {
-
-}
-
-func (d *DBORM) GetMweeterById() {
-
-}
-
 func (db *DBORM) CreateUser(user *models.User) error {
 
 	return db.Create(&user).Error

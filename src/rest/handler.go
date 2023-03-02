@@ -13,7 +13,6 @@ import (
 type HandlerInterface interface {
 	CreateUser(ctx *gin.Context)
 	SignInUser(ctx *gin.Context)
-	SignOutUser(ctx *gin.Context)
 	UpdateProfile(ctx *gin.Context)
 }
 
@@ -107,9 +106,6 @@ func (h *Handler) SignInUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, userInfo)
-}
-
-func (h *Handler) SignOutUser(ctx *gin.Context) {
 }
 
 func (h *Handler) UpdateProfile(ctx *gin.Context) {

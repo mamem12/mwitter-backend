@@ -1,6 +1,8 @@
 package rest
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"mwitter-backend/src/dblayer"
 	"mwitter-backend/src/models"
@@ -64,6 +66,18 @@ func (h *Handler) CreateUser(ctx *gin.Context) {
 		return
 	}
 
+	password := user.Password
+	hash := sha256.New()
+	_, err = hash.Write([]byte(password))
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
+
+	md := hash.Sum(nil)
+
+	user.Password = hex.EncodeToString(md)
+
 	err = h.db.CreateUser(user)
 
 	if err != nil {
@@ -92,14 +106,24 @@ func (h *Handler) SignInUser(ctx *gin.Context) {
 		return
 	}
 
+	password := user.Password
+	hash := sha256.New()
+	_, err = hash.Write([]byte(password))
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
+		return
+	}
+
+	md := hash.Sum(nil)
+	user.Password = hex.EncodeToString(md)
+
 	userInfo, err := h.db.SignInUser(user.Email, user.Password)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	// fmt.Println(userInfo)
 
 	if userInfo.ID == 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "not found"})

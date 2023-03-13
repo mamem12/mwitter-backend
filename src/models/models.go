@@ -5,10 +5,9 @@ import (
 )
 
 type User struct {
-	Nickname   string `json:"nickname"`
-	Email      string `json:"email"`
-	Password   string `json:"password"`
-	OAuth_Type string `json:"oAuth_Type"`
+	Nickname string `json:"nickname"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 	gorm.Model
 }
 

@@ -19,7 +19,7 @@ func TestCreateUser(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	createData := models.User{OAuth_Type: "Google", Password: "1234", Email: "example@email.com", Nickname: "mamem"}
+	createData := models.User{Password: "1234", Email: "example@email.com", Nickname: "mamem"}
 
 	data, _ := json.Marshal(createData)
 

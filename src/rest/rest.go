@@ -1,18 +1,35 @@
 package rest
 
 import (
+	"mwitter-backend/src/config/logger"
+
 	"github.com/gin-gonic/gin"
 )
 
 func RunAPI() *gin.Engine {
 
-	r := gin.Default()
+	router := gin.New()
 
-	h, _ := NewHandler()
+	logger.LogFactory()
 
-	r.POST("/users", h.CreateUser)
-	r.POST("/users/signin", h.SignInUser)
-	r.PUT("/users/:id", h.UpdateProfile)
+	router.Use(gin.LoggerWithFormatter(logger.LogFormat))
+	router.Use(gin.Recovery())
 
-	return r
+	// go parsebook.ParseRun()
+
+	UsersRouter(router)
+
+	return router
+}
+
+func UsersRouter(router *gin.Engine) *gin.RouterGroup {
+	handler, _ := NewHandler()
+
+	usersRouterGroup := router.Group("/users")
+
+	usersRouterGroup.POST("/", handler.CreateUser)
+	usersRouterGroup.POST("/signin", handler.SignInUser)
+	usersRouterGroup.PUT("/:id", handler.UpdateProfile)
+
+	return usersRouterGroup
 }

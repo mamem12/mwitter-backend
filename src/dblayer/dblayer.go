@@ -8,3 +8,6 @@ type DBLayer interface {
 	SelectUserByEmail(email string) (*models.User, error)
 	UpdateProfile(id string, UpdateInfo *models.User) error
 }
+
+type MovieLayer interface {
+}

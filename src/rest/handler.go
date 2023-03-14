@@ -1,9 +1,9 @@
 package rest
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
-	"fmt"
+	"log"
+	"mwitter-backend/src/auth"
+	"mwitter-backend/src/common"
 	"mwitter-backend/src/dblayer"
 	"mwitter-backend/src/models"
 	"net/http"
@@ -35,15 +35,18 @@ func NewHandler() (HandlerInterface, error) {
 }
 
 func (h *Handler) CreateUser(ctx *gin.Context) {
+
 	if h.db == nil {
 		return
 	}
+
+	log.Print("hello CreateUser")
 
 	user := &models.User{}
 	err := ctx.ShouldBindJSON(user)
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		common.HandleError(err.Error(), http.StatusBadRequest, ctx)
 		return
 	}
 
@@ -58,25 +61,18 @@ func (h *Handler) CreateUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 
-	fmt.Printf("%+v\n", existUser)
-	fmt.Printf("%s\n", existUser.Email)
-
 	if existUser.Email != "" {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "가입이 중복되었습니다."})
 		return
 	}
 
-	password := user.Password
-	hash := sha256.New()
-	_, err = hash.Write([]byte(password))
+	hashStr, err := common.StrToHash(user.Password)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 
-	md := hash.Sum(nil)
-
-	user.Password = hex.EncodeToString(md)
+	user.Password = hashStr
 
 	err = h.db.CreateUser(user)
 
@@ -106,17 +102,14 @@ func (h *Handler) SignInUser(ctx *gin.Context) {
 		return
 	}
 
-	password := user.Password
-	hash := sha256.New()
-	_, err = hash.Write([]byte(password))
+	hashStr, err := common.StrToHash(user.Password)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
 		return
 	}
 
-	md := hash.Sum(nil)
-	user.Password = hex.EncodeToString(md)
+	user.Password = hashStr
 
 	userInfo, err := h.db.SignInUser(user.Email, user.Password)
 
@@ -129,7 +122,11 @@ func (h *Handler) SignInUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "not found"})
 	}
 
-	ctx.JSON(http.StatusOK, userInfo)
+	jwt := auth.JWTToken{}
+
+	token, _ := jwt.CreateJWT(userInfo.ID)
+
+	ctx.JSON(http.StatusOK, token)
 }
 
 func (h *Handler) UpdateProfile(ctx *gin.Context) {

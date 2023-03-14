@@ -1,9 +1,14 @@
 package main
 
-import "mwitter-backend/src/rest"
+import (
+	"mwitter-backend/src/rest"
+)
 
 func main() {
-	// fmt.Println("Hello World")
-	ginEngine := rest.RunAPI()
-	ginEngine.Run(":8000")
+
+	r := rest.RunAPI()
+
+	// r.HandleContext(&s)
+
+	r.Run(":8080")
 }

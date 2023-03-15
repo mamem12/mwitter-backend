@@ -2,6 +2,7 @@ package rest
 
 import (
 	"mwitter-backend/src/config/logger"
+	"mwitter-backend/src/parsebook"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,7 +16,7 @@ func RunAPI() *gin.Engine {
 	router.Use(gin.LoggerWithFormatter(logger.LogFormat))
 	router.Use(gin.Recovery())
 
-	// go parsebook.ParseRun()
+	go parsebook.ParseRun()
 
 	UsersRouter(router)
 

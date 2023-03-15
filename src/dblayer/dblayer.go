@@ -1,13 +1,61 @@
 package dblayer
 
-import "mwitter-backend/src/models"
+import (
+	"fmt"
+	"mwitter-backend/src/models"
 
-type DBLayer interface {
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
+
+type UserLayer interface {
 	CreateUser(user *models.User) error
 	SignInUser(email, password string) (*models.User, error)
 	SelectUserByEmail(email string) (*models.User, error)
 	UpdateProfile(id string, UpdateInfo *models.User) error
 }
 
-type MovieLayer interface {
+type BookLayer interface {
+	InsertBookInfo(*models.BookInfo) error
+	InsertBookRank(*models.BookRank) error
+	InsertBookPrice(*models.BookPrice) error
+	InsertBookPoint(*models.BookPoint) error
+	InsertBookSummary(*models.BookSummary) error
+}
+
+type DBORM struct {
+	// *gorm.DB
+	*UserORM
+	*BookORM
+}
+
+var DB *DBORM
+
+func NewORM(dbname string, con gorm.Config) (*DBORM, error) {
+
+	if DB == nil {
+		dsn := fmt.Sprintf("root@tcp(localhost:3306)/%s?charset=utf8mb4&parseTime=true", dbname)
+		dsn = dsn + "&loc=Asia%2FSeoul"
+		db, err := gorm.Open(mysql.Open(dsn), &con)
+
+		if err != nil {
+			return nil, err
+		}
+
+		db.AutoMigrate(
+			&models.User{},
+			&models.BookInfo{},
+			&models.BookPoint{},
+			&models.BookPrice{},
+			&models.BookRank{},
+			&models.BookSummary{},
+		)
+		DB = &DBORM{
+			// DB: db,
+			&UserORM{DB: db},
+			&BookORM{DB: db},
+		}
+	}
+
+	return DB, nil
 }

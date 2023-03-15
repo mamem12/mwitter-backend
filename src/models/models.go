@@ -20,6 +20,7 @@ type BookInfo struct {
 	Publisher   string `json:"publisher"`
 	ReleaseDate string `json:"relesaseDate"`
 	Category    string `json:"category"`
+	Hash        string `gorm:"index:unique"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
@@ -42,7 +43,7 @@ type BookPrice struct {
 
 type BookPoint struct {
 	ID        uint   `json:"id",gorm:"primarykey"`
-	BookId    uint   `json:"bookId",gorm:"index"`
+	BookId    uint   `gorm:"index",json:"bookId"`
 	Point     string `json:"point"`
 	PointRate string `json:"pointRate"`
 	CreatedAt time.Time
@@ -51,7 +52,7 @@ type BookPoint struct {
 
 type BookSummary struct {
 	ID        uint   `json:"id",gorm:"primarykey"`
-	BookId    uint   `json:"bookId",gorm:"index"`
+	BookId    uint   `gorm:"index",json:"bookId"`
 	Summary   string `json:"Summary"`
 	CreatedAt time.Time
 	UpdatedAt time.Time

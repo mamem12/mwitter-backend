@@ -17,8 +17,8 @@ type HandlerInterface interface {
 	UpdateProfile(ctx *gin.Context)
 }
 
-type Handler struct {
-	db dblayer.DBLayer
+type UserHandler struct {
+	db dblayer.UserLayer
 }
 
 func NewHandler() (HandlerInterface, error) {
@@ -28,12 +28,12 @@ func NewHandler() (HandlerInterface, error) {
 		return nil, err
 	}
 
-	return &Handler{
-		db: db,
+	return &UserHandler{
+		db: db.UserORM,
 	}, nil
 }
 
-func (h *Handler) CreateUser(ctx *gin.Context) {
+func (h *UserHandler) CreateUser(ctx *gin.Context) {
 
 	if h.db == nil {
 		return
@@ -43,7 +43,7 @@ func (h *Handler) CreateUser(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(user)
 
 	if err != nil {
-		common.HandleError(err.Error(), http.StatusBadRequest, ctx)
+		common.HandleErrorWithResponse(err.Error(), http.StatusBadRequest, ctx)
 		return
 	}
 
@@ -80,7 +80,7 @@ func (h *Handler) CreateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, user.ID)
 }
 
-func (h *Handler) SignInUser(ctx *gin.Context) {
+func (h *UserHandler) SignInUser(ctx *gin.Context) {
 
 	if h.db == nil {
 		return
@@ -126,7 +126,7 @@ func (h *Handler) SignInUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, token)
 }
 
-func (h *Handler) UpdateProfile(ctx *gin.Context) {
+func (h *UserHandler) UpdateProfile(ctx *gin.Context) {
 
 	if h.db == nil {
 		return
@@ -164,7 +164,7 @@ func Certification() gin.HandlerFunc {
 		err := jwt.TokenValid(ctx)
 
 		if err != nil {
-			common.HandleError(err.Error(), http.StatusInternalServerError, ctx)
+			common.HandleErrorWithResponse(err.Error(), http.StatusInternalServerError, ctx)
 			return
 		} else {
 			ctx.Next()

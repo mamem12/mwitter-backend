@@ -2,6 +2,7 @@ package parsebook
 
 import (
 	"fmt"
+	"log"
 	"mwitter-backend/src/models"
 	"net/http"
 	"sync"
@@ -12,10 +13,9 @@ import (
 )
 
 const (
-	CronSpec   = "0 0,30 * * * *"
-	apiURL     = "https://product.kyobobook.co.kr/api/gw/pdt/best-seller/online?page=%d&per=20&saleCmdtDvsnCode=KOR&saleCmdtClstCode=01&saleCmdtDsplDvsnCode=KOR&period=002&dsplDvsnCode=001&dsplTrgtDvsnCode=004"
-	user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
-	MAX_PAGE   = 5
+	CronSpec = "0 31 * * * *"
+	apiURL   = "https://product.kyobobook.co.kr/api/gw/pdt/best-seller/online?page=%d&per=20&saleCmdtDvsnCode=KOR&saleCmdtClstCode=01&saleCmdtDsplDvsnCode=KOR&period=002&dsplDvsnCode=001&dsplTrgtDvsnCode=004"
+	MAX_PAGE = 2
 )
 
 type Book struct {
@@ -38,21 +38,23 @@ func ParseRun() {
 }
 
 func getPage() {
+	log.Println("cron start")
 	var wg sync.WaitGroup
 	wg.Add(1)
 	pageRecieveChannel := make(chan []gjson.Result, MAX_PAGE)
 	contentChannel := make(chan []Book)
 
 	var content []gjson.Result
-	for i := 1; i <= 2; i++ {
+	for i := 1; i <= MAX_PAGE; i++ {
 		go getBookContent(i, pageRecieveChannel)
 	}
-	for i := 1; i <= 2; i++ {
+
+	for i := 1; i <= MAX_PAGE; i++ {
 		contents := <-pageRecieveChannel
 		content = append(content, contents...)
 	}
 
-	go parsePage(content, contentChannel, &wg)
+	go parseBook(content, contentChannel, &wg)
 
 	close(pageRecieveChannel)
 
@@ -60,7 +62,10 @@ func getPage() {
 
 	wg.Wait()
 	close(contentChannel)
+
 	fmt.Println("wait end", len(result))
+
+	NewBookInsertHandler(result...)
 }
 
 func getBookContent(pageNum int, pageRecieveChannel chan<- []gjson.Result) {
@@ -90,7 +95,7 @@ func getBookContent(pageNum int, pageRecieveChannel chan<- []gjson.Result) {
 	pageRecieveChannel <- content
 }
 
-func parsePage(jsonContents []gjson.Result, contentChannel chan []Book, wg *sync.WaitGroup) {
+func parseBook(jsonContents []gjson.Result, contentChannel chan []Book, wg *sync.WaitGroup) {
 	var BookList []Book
 
 	for _, jsonBookcontent := range jsonContents {

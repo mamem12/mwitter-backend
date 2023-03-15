@@ -29,7 +29,7 @@ func UsersRouter(router *gin.Engine) *gin.RouterGroup {
 
 	usersRouterGroup.POST("/", handler.CreateUser)
 	usersRouterGroup.POST("/signin", handler.SignInUser)
-	usersRouterGroup.PUT("/:id", handler.UpdateProfile)
+	usersRouterGroup.PUT("/:id", Certification(), handler.UpdateProfile)
 
 	return usersRouterGroup
 }

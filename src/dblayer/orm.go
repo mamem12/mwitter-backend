@@ -14,11 +14,18 @@ type DBORM struct {
 
 func NewORM(dbname string, con gorm.Config) (*DBORM, error) {
 
-	dsn := fmt.Sprintf("root@tcp(127.0.0.1:3306)/%s?charset=utf8mb4&parseTime=true", dbname)
+	dsn := fmt.Sprintf("root@tcp(localhost:3306)/%s?charset=utf8mb4&parseTime=true", dbname)
 	dsn = dsn + "&loc=Asia%2FSeoul"
 	db, err := gorm.Open(mysql.Open(dsn), &con)
 
-	db.AutoMigrate(&models.User{}, &models.Mweet{})
+	db.AutoMigrate(
+		&models.User{},
+		&models.BookInfo{},
+		&models.BookPoint{},
+		&models.BookPrice{},
+		&models.BookRank{},
+		&models.BookSummary{},
+	)
 
 	return &DBORM{
 		DB: db,
@@ -35,10 +42,6 @@ func (db *DBORM) SignInUser(email, password string) (userInfo *models.User, err 
 	result := db.Table("users").Select("nickname", "email", "id").Where(&models.User{Email: email, Password: password})
 
 	return userInfo, result.Find(&userInfo).Error
-}
-
-func (d *DBORM) SignOutUser() {
-
 }
 
 func (db *DBORM) UpdateProfile(id string, updateInfo *models.User) error {

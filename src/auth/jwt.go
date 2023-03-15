@@ -39,7 +39,7 @@ func (j *JWTToken) TokenValid(ctx *gin.Context) error {
 		return err
 	}
 	if _, ok := token.Claims.(jwt.Claims); !ok && !token.Valid {
-		return fmt.Errorf("")
+		return fmt.Errorf("유효하지 않은 토큰입니다.")
 	}
 	return nil
 }
@@ -64,6 +64,9 @@ func extractJWT(ctx *gin.Context) string {
 
 	const BEARER_SCHEMA = "Bearer "
 	authHeader := ctx.GetHeader("Authorization")
+	if authHeader == "" {
+		return ""
+	}
 	tokenString := authHeader[len(BEARER_SCHEMA):]
 
 	return tokenString

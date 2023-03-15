@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"log"
 	"mwitter-backend/src/auth"
 	"mwitter-backend/src/common"
 	"mwitter-backend/src/dblayer"
@@ -39,8 +38,6 @@ func (h *Handler) CreateUser(ctx *gin.Context) {
 	if h.db == nil {
 		return
 	}
-
-	log.Print("hello CreateUser")
 
 	user := &models.User{}
 	err := ctx.ShouldBindJSON(user)
@@ -158,4 +155,19 @@ func (h *Handler) UpdateProfile(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, id)
+}
+
+func Certification() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		jwt := auth.JWTToken{}
+
+		err := jwt.TokenValid(ctx)
+
+		if err != nil {
+			common.HandleError(err.Error(), http.StatusInternalServerError, ctx)
+			return
+		} else {
+			ctx.Next()
+		}
+	}
 }

@@ -8,7 +8,5 @@ func main() {
 
 	r := rest.RunAPI()
 
-	// r.HandleContext(&s)
-
 	r.Run(":8080")
 }

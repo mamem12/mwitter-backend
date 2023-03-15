@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
+	"mwitter-backend/src/auth"
 	"mwitter-backend/src/models"
 	"net/http"
 	"net/http/httptest"
@@ -69,6 +70,8 @@ func TestUpdateProfile(t *testing.T) {
 
 	router := RunAPI()
 
+	userId := "1"
+
 	w := httptest.NewRecorder()
 
 	updateDate := models.User{Nickname: "mamem2"}
@@ -77,11 +80,23 @@ func TestUpdateProfile(t *testing.T) {
 
 	reader := strings.NewReader(string(data))
 
-	req, err := http.NewRequest("PUT", "/users/1", reader)
+	req, err := http.NewRequest("PUT", "/users/"+userId, reader)
 
+	jwt := auth.JWTToken{}
+
+	tokenString, _ := jwt.CreateJWT(1)
+
+	req.Header.Add("Authorization", "Bearer "+tokenString)
 	assert.NoError(err)
 
 	fmt.Println()
 
 	router.ServeHTTP(w, req)
+
+	msg := ""
+
+	err = json.NewDecoder(w.Body).Decode(&msg)
+
+	assert.NoError(err)
+	assert.Equal(msg, userId)
 }

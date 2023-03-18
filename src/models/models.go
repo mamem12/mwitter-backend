@@ -6,6 +6,14 @@ import (
 	"gorm.io/gorm"
 )
 
+type Book struct {
+	BookInfo
+	BookRank
+	BookPrice
+	BookPoint
+	BookSummary
+}
+
 type User struct {
 	Nickname string `json:"nickname"`
 	Email    string `json:"email"`

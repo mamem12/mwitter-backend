@@ -13,18 +13,10 @@ import (
 )
 
 const (
-	CronSpec = "0 31 * * * *"
+	CronSpec = "0 0,52 * * * *"
 	apiURL   = "https://product.kyobobook.co.kr/api/gw/pdt/best-seller/online?page=%d&per=20&saleCmdtDvsnCode=KOR&saleCmdtClstCode=01&saleCmdtDsplDvsnCode=KOR&period=002&dsplDvsnCode=001&dsplTrgtDvsnCode=004"
 	MAX_PAGE = 2
 )
-
-type Book struct {
-	models.BookInfo
-	models.BookRank
-	models.BookPrice
-	models.BookPoint
-	models.BookSummary
-}
 
 func ParseRun() {
 	cron := cron.New()
@@ -42,7 +34,7 @@ func getPage() {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	pageRecieveChannel := make(chan []gjson.Result, MAX_PAGE)
-	contentChannel := make(chan []Book)
+	contentChannel := make(chan []models.Book)
 
 	var content []gjson.Result
 	for i := 1; i <= MAX_PAGE; i++ {
@@ -95,15 +87,15 @@ func getBookContent(pageNum int, pageRecieveChannel chan<- []gjson.Result) {
 	pageRecieveChannel <- content
 }
 
-func parseBook(jsonContents []gjson.Result, contentChannel chan []Book, wg *sync.WaitGroup) {
-	var BookList []Book
+func parseBook(jsonContents []gjson.Result, contentChannel chan []models.Book, wg *sync.WaitGroup) {
+	var BookList []models.Book
 
 	for _, jsonBookcontent := range jsonContents {
-		bookInfoCh := make(chan *Book)
-		bookRankCh := make(chan *Book)
-		bookPriceCh := make(chan *Book)
-		bookPointCh := make(chan *Book)
-		bookSummaryCh := make(chan *Book)
+		bookInfoCh := make(chan *models.Book)
+		bookRankCh := make(chan *models.Book)
+		bookPriceCh := make(chan *models.Book)
+		bookPointCh := make(chan *models.Book)
+		bookSummaryCh := make(chan *models.Book)
 
 		go parseBookBasicInfo(jsonBookcontent, bookInfoCh)
 		go parseBookRank(jsonBookcontent, bookInfoCh, bookRankCh)
@@ -119,7 +111,7 @@ func parseBook(jsonContents []gjson.Result, contentChannel chan []Book, wg *sync
 	wg.Done()
 }
 
-func parseBookBasicInfo(jsonBook gjson.Result, bookInfoCh chan *Book) {
+func parseBookBasicInfo(jsonBook gjson.Result, bookInfoCh chan *models.Book) {
 	title := jsonBook.Get("cmdtName")
 	author := jsonBook.Get("chrcName")
 	publisher := jsonBook.Get("pbcmName")
@@ -134,7 +126,7 @@ func parseBookBasicInfo(jsonBook gjson.Result, bookInfoCh chan *Book) {
 		Category:    category.String(),
 	}
 
-	book := &Book{
+	book := &models.Book{
 		BookInfo: *bookInfo,
 	}
 
@@ -143,7 +135,7 @@ func parseBookBasicInfo(jsonBook gjson.Result, bookInfoCh chan *Book) {
 	close(bookInfoCh)
 }
 
-func parseBookRank(jsonBook gjson.Result, bookInfoCh chan *Book, bookRankCh chan *Book) {
+func parseBookRank(jsonBook gjson.Result, bookInfoCh chan *models.Book, bookRankCh chan *models.Book) {
 
 	for bookInfo := range bookInfoCh {
 		rank := jsonBook.Get("prstRnkn")
@@ -157,7 +149,7 @@ func parseBookRank(jsonBook gjson.Result, bookInfoCh chan *Book, bookRankCh chan
 	close(bookRankCh)
 }
 
-func parseBookPrice(jsonBook gjson.Result, bookRankCh chan *Book, bookPriceCh chan *Book) {
+func parseBookPrice(jsonBook gjson.Result, bookRankCh chan *models.Book, bookPriceCh chan *models.Book) {
 	for bookInfo := range bookRankCh {
 		price := jsonBook.Get("price")
 		discountPrice := jsonBook.Get("sapr")
@@ -176,7 +168,7 @@ func parseBookPrice(jsonBook gjson.Result, bookRankCh chan *Book, bookPriceCh ch
 	close(bookPriceCh)
 }
 
-func parseBookPoint(jsonBook gjson.Result, bookPriceCh chan *Book, bookPointCh chan *Book) {
+func parseBookPoint(jsonBook gjson.Result, bookPriceCh chan *models.Book, bookPointCh chan *models.Book) {
 	for bookInfo := range bookPriceCh {
 		point := jsonBook.Get("upntAcmlAmnt")
 		pointRate := jsonBook.Get("upntAcmlRate")
@@ -192,7 +184,7 @@ func parseBookPoint(jsonBook gjson.Result, bookPriceCh chan *Book, bookPointCh c
 	close(bookPointCh)
 }
 
-func parseBookSummary(jsonBook gjson.Result, bookPointCh chan *Book, bookSummaryCh chan *Book) {
+func parseBookSummary(jsonBook gjson.Result, bookPointCh chan *models.Book, bookSummaryCh chan *models.Book) {
 	for bookInfo := range bookPointCh {
 		summary := jsonBook.Get("inbukCntt")
 

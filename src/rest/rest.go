@@ -19,11 +19,12 @@ func RunAPI() *gin.Engine {
 	go parsebook.ParseRun()
 
 	UsersRouter(router)
+	BookRouter(router)
 
 	return router
 }
 
-func UsersRouter(router *gin.Engine) *gin.RouterGroup {
+func UsersRouter(router *gin.Engine) {
 	handler, _ := NewHandler()
 
 	usersRouterGroup := router.Group("/users")
@@ -32,5 +33,15 @@ func UsersRouter(router *gin.Engine) *gin.RouterGroup {
 	usersRouterGroup.POST("/signin", handler.SignInUser)
 	usersRouterGroup.PUT("/:id", Certification(), handler.UpdateProfile)
 
-	return usersRouterGroup
+}
+
+func BookRouter(router *gin.Engine) {
+
+	handler, _ := parsebook.NewBookHandler()
+
+	booksRouterGroup := router.Group("/books")
+
+	booksRouterGroup.GET("/", handler.GetBookList)
+	booksRouterGroup.GET("/:id", handler.GetBookInfoAll)
+
 }

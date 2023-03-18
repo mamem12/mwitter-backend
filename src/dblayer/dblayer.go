@@ -21,6 +21,12 @@ type BookLayer interface {
 	InsertBookPrice(*models.BookPrice) error
 	InsertBookPoint(*models.BookPoint) error
 	InsertBookSummary(*models.BookSummary) error
+	GetAllBook() (*[]models.BookInfo, error)
+	GetBookInfoById(id uint) (models.BookInfo, error)
+	GetBookInfoWithRank(id uint) ([]models.BookRank, error)
+	GetBookInfoWithPoint(id uint) ([]models.BookPoint, error)
+	GetBookInfoWithPrice(id uint) ([]models.BookPrice, error)
+	GetBookInfoWithSummary(id uint) (models.BookSummary, error)
 }
 
 type DBORM struct {

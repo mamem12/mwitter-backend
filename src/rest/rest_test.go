@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/tidwall/gjson"
 )
 
 func TestCreateUser(t *testing.T) {
@@ -99,4 +100,29 @@ func TestUpdateProfile(t *testing.T) {
 
 	assert.NoError(err)
 	assert.Equal(msg, userId)
+}
+
+func TestBookInfo(t *testing.T) {
+	assert := assert.New(t)
+
+	router := RunAPI()
+
+	w := httptest.NewRecorder()
+
+	req, err := http.NewRequest("GET", "/books/2", nil)
+
+	assert.NoError(err)
+
+	router.ServeHTTP(w, req)
+
+	var body string
+
+	err = json.NewDecoder(w.Body).Decode(&body)
+
+	assert.NoError(err)
+
+	assert.Equal(200, w.Code)
+
+	gJson := gjson.Parse(body)
+	fmt.Println(gJson)
 }

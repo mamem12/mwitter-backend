@@ -3,6 +3,7 @@ package dblayer
 import (
 	"fmt"
 	"mwitter-backend/src/models"
+	"os"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -35,7 +36,13 @@ var DB *DBORM
 func NewORM(dbname string, con gorm.Config) (*DBORM, error) {
 
 	if DB == nil {
-		dsn := fmt.Sprintf("root@tcp(localhost:3306)/%s?charset=utf8mb4&parseTime=true", dbname)
+		host := os.Getenv("HOST")
+
+		if host == "" {
+			host = "localhost:3306"
+		}
+
+		dsn := fmt.Sprintf("root@tcp(%s)/%s?charset=utf8mb4&parseTime=true", host, dbname)
 		dsn = dsn + "&loc=Asia%2FSeoul"
 		db, err := gorm.Open(mysql.Open(dsn), &con)
 

@@ -3,7 +3,6 @@ package rest
 import (
 	"mwitter-backend/src/auth"
 	"mwitter-backend/src/common"
-	"mwitter-backend/src/config/logger"
 	"mwitter-backend/src/rest/handler"
 	"net/http"
 
@@ -14,9 +13,6 @@ func RunAPI() *gin.Engine {
 
 	router := gin.New()
 
-	logger.LogFactory()
-
-	router.Use(gin.LoggerWithFormatter(logger.LogFormat))
 	router.Use(gin.Recovery())
 
 	UsersRouter(router)

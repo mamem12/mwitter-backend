@@ -6,33 +6,9 @@ import (
 	"gorm.io/gorm"
 )
 
-// type DBORM struct {
-// 	*gorm.DB
-// }
-
 type UserORM struct {
 	*gorm.DB
 }
-
-// func NewORM(dbname string, con gorm.Config) (*DBORM, error) {
-
-// 	dsn := fmt.Sprintf("root@tcp(localhost:3306)/%s?charset=utf8mb4&parseTime=true", dbname)
-// 	dsn = dsn + "&loc=Asia%2FSeoul"
-// 	db, err := gorm.Open(mysql.Open(dsn), &con)
-
-// 	db.AutoMigrate(
-// 		&models.User{},
-// 		&models.BookInfo{},
-// 		&models.BookPoint{},
-// 		&models.BookPrice{},
-// 		&models.BookRank{},
-// 		&models.BookSummary{},
-// 	)
-
-// 	return &DBORM{
-// 		DB: db,
-// 	}, err
-// }
 
 func (db *UserORM) CreateUser(user *models.User) error {
 

@@ -34,60 +34,6 @@ func NewBookHandler() (HandlerInterface, error) {
 	}, nil
 }
 
-// func NewBookInsertHandler(books ...models.Book) error {
-
-// 	db, err := dblayer.NewORM("test", gorm.Config{})
-
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	for _, book := range books {
-// 		title := book.BookInfo.Title
-// 		author := book.BookInfo.Author
-// 		publisher := book.BookInfo.Publisher
-
-// 		hash, _ := common.StrToHash(title + author + publisher)
-
-// 		book.BookInfo.Hash = hash
-
-// 		existBook, _ := db.GetBookInfoByHash(hash)
-// 		var id uint
-// 		if existBook.Hash == "" {
-
-// 			err = db.InsertBookInfo(&book.BookInfo)
-// 			id = book.BookInfo.ID
-// 		} else {
-
-// 			err = db.UpdateBookInfo(&book.BookInfo)
-// 			if err != nil {
-// 				continue
-// 			}
-
-// 			id = existBook.ID
-
-// 		}
-
-// 		if err != nil {
-// 			return err
-// 		}
-
-// 		// id := book.BookInfo.ID
-
-// 		book.BookRank.BookId = id
-// 		book.BookPrice.BookId = id
-// 		book.BookPoint.BookId = id
-// 		book.BookSummary.BookId = id
-
-// 		db.InsertBookRank(&book.BookRank)
-// 		db.InsertBookPrice(&book.BookPrice)
-// 		db.InsertBookPoint(&book.BookPoint)
-// 		db.InsertBookSummary(&book.BookSummary)
-// 	}
-
-// 	return nil
-// }
-
 // per - 20개씩 (기본), 50개씩(옵션) √
 // page - 하나씩 증가 가능 √
 // sort - √

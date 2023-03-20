@@ -16,12 +16,12 @@ type UserLayer interface {
 }
 
 type BookLayer interface {
-	InsertBookInfo(*models.BookInfo) error
-	InsertBookRank(*models.BookRank) error
-	InsertBookPrice(*models.BookPrice) error
-	InsertBookPoint(*models.BookPoint) error
-	InsertBookSummary(*models.BookSummary) error
-	GetAllBook() (*[]models.BookInfo, error)
+	// InsertBookInfo(*models.BookInfo) error
+	// InsertBookRank(*models.BookRank) error
+	// InsertBookPrice(*models.BookPrice) error
+	// InsertBookPoint(*models.BookPoint) error
+	// InsertBookSummary(*models.BookSummary) error
+	GetAllBook(per int, pageIdx int, sort string) (*[]models.BookInfo, error)
 	GetBookInfoById(id uint) (models.BookInfo, error)
 	GetBookInfoWithRank(id uint) ([]models.BookRank, error)
 	GetBookInfoWithPoint(id uint) ([]models.BookPoint, error)

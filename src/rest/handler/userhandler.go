@@ -1,4 +1,4 @@
-package rest
+package handler
 
 import (
 	"mwitter-backend/src/auth"
@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type HandlerInterface interface {
+type UserHandlerInterface interface {
 	CreateUser(ctx *gin.Context)
 	SignInUser(ctx *gin.Context)
 	UpdateProfile(ctx *gin.Context)
@@ -21,7 +21,7 @@ type UserHandler struct {
 	db dblayer.UserLayer
 }
 
-func NewHandler() (HandlerInterface, error) {
+func NewUserHandler() (UserHandlerInterface, error) {
 	db, err := dblayer.NewORM("test", gorm.Config{})
 
 	if err != nil {
@@ -155,19 +155,4 @@ func (h *UserHandler) UpdateProfile(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, id)
-}
-
-func Certification() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		jwt := auth.JWTToken{}
-
-		err := jwt.TokenValid(ctx)
-
-		if err != nil {
-			common.HandleErrorWithResponse(err.Error(), http.StatusInternalServerError, ctx)
-			return
-		} else {
-			ctx.Next()
-		}
-	}
 }

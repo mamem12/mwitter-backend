@@ -22,29 +22,31 @@ type User struct {
 }
 
 type BookInfo struct {
-	ID          uint   `json:"id",gorm:"primarykey"`
-	Title       string `json:"title"`
-	Author      string `json:"Author"`
-	Publisher   string `json:"publisher"`
-	ReleaseDate string `json:"relesaseDate"`
-	Category    string `json:"category"`
-	Hash        string `gorm:"index:unique"`
+	ID          uint    `json:"id",gorm:"primarykey"`
+	Title       string  `gorm:"type:varchar(100)",json:"title"`
+	Author      string  `json:"Author"`
+	Publisher   string  `json:"publisher"`
+	ReleaseDate string  `json:"relesaseDate"`
+	Category    string  `json:"category"`
+	ReviewCnt   uint    `json:"review"`
+	Avg         float32 `json:"avg"`
+	Hash        string  `gorm:"index:unique"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
 
 type BookRank struct {
-	ID        uint   `json:"id",gorm:"primarykey"`
-	BookId    uint   `gorm:"index",json:"bookId"`
-	Rank      string `json:"rank"`
+	ID        uint `json:"id",gorm:"primarykey"`
+	BookId    uint `gorm:"index",json:"bookId"`
+	Rank      uint `json:"rank"`
 	CreatedAt time.Time
 }
 
 type BookPrice struct {
 	ID            uint   `json:"id",gorm:"primarykey"`
 	BookId        uint   `gorm:"index",json:"bookId"`
-	Price         string `json:"price"`
-	DiscountPrice string `json:"discountPrice"`
+	Price         uint   `json:"price"`
+	DiscountPrice uint   `json:"discountPrice"`
 	DiscountRate  string `json:"discountRate"`
 	CreatedAt     time.Time
 }
@@ -55,15 +57,14 @@ type BookPoint struct {
 	Point     string `json:"point"`
 	PointRate string `json:"pointRate"`
 	CreatedAt time.Time
-	UpdatedAt time.Time
 }
 
 type BookSummary struct {
 	ID        uint   `json:"id",gorm:"primarykey"`
 	BookId    uint   `gorm:"index",json:"bookId"`
 	Summary   string `json:"Summary"`
+	Hash      string `gorm:"type:varchar(100)"`
 	CreatedAt time.Time
-	UpdatedAt time.Time
 }
 
 func (User) TableName() string {
@@ -71,21 +72,21 @@ func (User) TableName() string {
 }
 
 func (BookInfo) TableName() string {
-	return "bookinfo"
+	return "book_info"
 }
 
 func (BookRank) TableName() string {
-	return "bookRank"
+	return "book_rank"
 }
 
 func (BookPrice) TableName() string {
-	return "bookprice"
+	return "book_price"
 }
 
 func (BookPoint) TableName() string {
-	return "bookpoint"
+	return "book_point"
 }
 
 func (BookSummary) TableName() string {
-	return "booksummary"
+	return "book_summary"
 }

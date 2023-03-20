@@ -55,15 +55,17 @@ func TestSignInUser(t *testing.T) {
 
 	router.ServeHTTP(w, req)
 
-	resultUser := &models.User{}
-
-	err = json.NewDecoder(w.Body).Decode(resultUser)
+	assert.Equal(200, w.Code)
+	// resultUser := &models.User{}
+	var jwt string
+	err = json.NewDecoder(w.Body).Decode(&jwt)
 
 	assert.NoError(err)
 
-	assert.Equal(200, w.Code)
-	assert.Equal("example@email.com", resultUser.Email)
-	assert.Equal("", resultUser.Password)
+	fmt.Println(jwt)
+
+	// assert.Equal("example@email.com", resultUser.Email)
+	// assert.Equal("", resultUser.Password)
 }
 
 func TestUpdateProfile(t *testing.T) {
@@ -102,6 +104,39 @@ func TestUpdateProfile(t *testing.T) {
 	assert.Equal(msg, userId)
 }
 
+func TestBookList(t *testing.T) {
+	assert := assert.New(t)
+
+	router := RunAPI()
+
+	w := httptest.NewRecorder()
+
+	reader := strings.NewReader("")
+
+	req, err := http.NewRequest("GET", "/books?per=20&page=3&sort=price", reader)
+
+	req.Header.Add("Authorization", "Bearer "+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NzkzNjUzMTMsInVzZXJJZCI6MX0.t26PT6BxMAo63O0DXQN143Tu1Km-J6yDv48C94qxxUQ")
+
+	assert.NoError(err)
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(w.Code, http.StatusOK)
+
+	var body *[]models.BookInfo
+
+	err = json.NewDecoder(w.Body).Decode(&body)
+
+	fmt.Println(len(*body))
+
+	// for _, v := range *body {
+	// 	fmt.Printf("%+v\n", v)
+	// }
+
+	assert.NoError(err)
+
+}
+
 func TestBookInfo(t *testing.T) {
 	assert := assert.New(t)
 
@@ -109,7 +144,11 @@ func TestBookInfo(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	req, err := http.NewRequest("GET", "/books/2", nil)
+	reader := strings.NewReader("")
+
+	req, err := http.NewRequest("GET", "/books/3", reader)
+
+	req.Header.Add("Authorization", "Bearer "+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NzkzNjUzMTMsInVzZXJJZCI6MX0.t26PT6BxMAo63O0DXQN143Tu1Km-J6yDv48C94qxxUQ")
 
 	assert.NoError(err)
 
@@ -125,4 +164,33 @@ func TestBookInfo(t *testing.T) {
 
 	gJson := gjson.Parse(body)
 	fmt.Println(gJson)
+}
+
+func TestBookRank(t *testing.T) {
+	assert := assert.New(t)
+
+	router := RunAPI()
+
+	w := httptest.NewRecorder()
+
+	reader := strings.NewReader("")
+
+	req, err := http.NewRequest("GET", "/books/rank/3", reader)
+
+	req.Header.Add("Authorization", "Bearer "+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NzkzNjUzMTMsInVzZXJJZCI6MX0.t26PT6BxMAo63O0DXQN143Tu1Km-J6yDv48C94qxxUQ")
+
+	assert.NoError(err)
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(w.Code, http.StatusOK)
+
+	var body string
+
+	err = json.NewDecoder(w.Body).Decode(&body)
+
+	assert.NoError(err)
+
+	fmt.Printf("%+v\n", body)
+
 }

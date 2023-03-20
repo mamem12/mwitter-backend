@@ -1,10 +1,10 @@
-package parsebook
+package handler
 
 import (
 	"encoding/json"
+	"log"
 	"mwitter-backend/src/common"
 	"mwitter-backend/src/dblayer"
-	"mwitter-backend/src/models"
 	"net/http"
 	"strconv"
 
@@ -34,66 +34,97 @@ func NewBookHandler() (HandlerInterface, error) {
 	}, nil
 }
 
-func NewBookInsertHandler(books ...models.Book) error {
+// func NewBookInsertHandler(books ...models.Book) error {
 
-	db, err := dblayer.NewORM("test", gorm.Config{})
+// 	db, err := dblayer.NewORM("test", gorm.Config{})
+
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	for _, book := range books {
+// 		title := book.BookInfo.Title
+// 		author := book.BookInfo.Author
+// 		publisher := book.BookInfo.Publisher
+
+// 		hash, _ := common.StrToHash(title + author + publisher)
+
+// 		book.BookInfo.Hash = hash
+
+// 		existBook, _ := db.GetBookInfoByHash(hash)
+// 		var id uint
+// 		if existBook.Hash == "" {
+
+// 			err = db.InsertBookInfo(&book.BookInfo)
+// 			id = book.BookInfo.ID
+// 		} else {
+
+// 			err = db.UpdateBookInfo(&book.BookInfo)
+// 			if err != nil {
+// 				continue
+// 			}
+
+// 			id = existBook.ID
+
+// 		}
+
+// 		if err != nil {
+// 			return err
+// 		}
+
+// 		// id := book.BookInfo.ID
+
+// 		book.BookRank.BookId = id
+// 		book.BookPrice.BookId = id
+// 		book.BookPoint.BookId = id
+// 		book.BookSummary.BookId = id
+
+// 		db.InsertBookRank(&book.BookRank)
+// 		db.InsertBookPrice(&book.BookPrice)
+// 		db.InsertBookPoint(&book.BookPoint)
+// 		db.InsertBookSummary(&book.BookSummary)
+// 	}
+
+// 	return nil
+// }
+
+// per - 20개씩 (기본), 50개씩(옵션) √
+// page - 하나씩 증가 가능 √
+// sort - √
+// 	정렬 ID 순(rank순),
+//	리뷰순,
+// 	평점순, => info, rank 조인하여 내부 처리
+//	가격순 => info, price 조인하여 내부 처리
+
+func (book *BookHandler) GetBookList(ctx *gin.Context) {
+
+	sortParam := ctx.DefaultQuery("sort", "rank")
+	perParam := ctx.DefaultQuery("per", "20")
+	pageParam := ctx.DefaultQuery("page", "1")
+
+	per, err := strconv.Atoi(perParam)
 
 	if err != nil {
-		return err
+		per = 20
+	} else if per > 50 {
+		per = 50
 	}
 
-	for _, book := range books {
-		title := book.BookInfo.Title
-		author := book.BookInfo.Author
-		publisher := book.BookInfo.Publisher
+	page, err := strconv.Atoi(pageParam)
 
-		hash, _ := common.StrToHash(title + author + publisher)
-
-		book.BookInfo.Hash = hash
-
-		existBook, _ := db.GetBookInfoByHash(hash)
-		var id uint
-		if existBook.Hash == "" {
-
-			err = db.InsertBookInfo(&book.BookInfo)
-			id = book.BookInfo.ID
-		} else {
-
-			err = db.UpdateBookInfo(&book.BookInfo)
-			if err != nil {
-				continue
-			}
-
-			id = existBook.ID
-
-		}
-
-		if err != nil {
-			return err
-		}
-
-		// id := book.BookInfo.ID
-
-		book.BookRank.BookId = id
-		book.BookPrice.BookId = id
-		book.BookPoint.BookId = id
-		book.BookSummary.BookId = id
-
-		db.InsertBookRank(&book.BookRank)
-		db.InsertBookPrice(&book.BookPrice)
-		db.InsertBookPoint(&book.BookPoint)
-		db.InsertBookSummary(&book.BookSummary)
+	if err != nil {
+		page = 1
 	}
 
-	return nil
-}
+	pageIdx := (per * page) - per
 
-// get all, limit 20
-func (book *BookHandler) GetBookList(ctx *gin.Context) {
-	bookList, err := book.db.GetAllBook()
+	log.Printf("sort : %s, per : %d, page : %d\n", sortParam, per, page)
+
+	bookList, err := book.db.GetAllBook(per, pageIdx, sortParam)
 
 	if err != nil {
 		common.HandleErrorWithResponse(err.Error(), http.StatusInternalServerError, ctx)
+		return
 	}
 
 	ctx.JSON(http.StatusOK, bookList)
@@ -160,5 +191,3 @@ func (book *BookHandler) GetBookRank(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, string(data))
 }
-
-// get one by price & point list

@@ -1,8 +1,11 @@
 package rest
 
 import (
+	"mwitter-backend/src/auth"
+	"mwitter-backend/src/common"
 	"mwitter-backend/src/config/logger"
-	"mwitter-backend/src/parsebook"
+	"mwitter-backend/src/rest/handler"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,8 +19,6 @@ func RunAPI() *gin.Engine {
 	router.Use(gin.LoggerWithFormatter(logger.LogFormat))
 	router.Use(gin.Recovery())
 
-	go parsebook.ParseRun()
-
 	UsersRouter(router)
 	BookRouter(router)
 
@@ -25,7 +26,7 @@ func RunAPI() *gin.Engine {
 }
 
 func UsersRouter(router *gin.Engine) {
-	handler, _ := NewHandler()
+	handler, _ := handler.NewUserHandler()
 
 	usersRouterGroup := router.Group("/users")
 
@@ -37,11 +38,27 @@ func UsersRouter(router *gin.Engine) {
 
 func BookRouter(router *gin.Engine) {
 
-	handler, _ := parsebook.NewBookHandler()
+	handler, _ := handler.NewBookHandler()
 
-	booksRouterGroup := router.Group("/books")
+	booksRouterGroup := router.Group("/books", Certification())
 
-	booksRouterGroup.GET("/", handler.GetBookList)
+	booksRouterGroup.GET("", handler.GetBookList)
 	booksRouterGroup.GET("/:id", handler.GetBookInfoAll)
+	booksRouterGroup.GET("/rank/:id", handler.GetBookRank)
 
+}
+
+func Certification() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		jwt := auth.JWTToken{}
+
+		err := jwt.TokenValid(ctx)
+
+		if err != nil {
+			common.HandleErrorWithResponse(err.Error(), http.StatusInternalServerError, ctx)
+			return
+		} else {
+			ctx.Next()
+		}
+	}
 }
